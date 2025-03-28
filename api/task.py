@@ -10,7 +10,8 @@ from fastapi import APIRouter
 from loguru import logger
 from commonts.settings import settings
 from commonts.base_model import BaseResponseModel
-from celery_task.task import add
+from celery_task.task import send_msg
+from models.message import NewMessageModel
 
 router = APIRouter()
 
@@ -20,7 +21,7 @@ class TaskResponse(BaseResponseModel):
 
 
 @router.post('/add_task', response_model=TaskResponse)
-async def add_task(a: int, b: int):
-    task_id = add.apply_async((a,b))
+async def add_task(new_msg:NewMessageModel):
+    task_id = send_msg.apply_async(kwargs={'new_msg':new_msg})
     task_id = str(task_id)
     return TaskResponse(data=task_id)
