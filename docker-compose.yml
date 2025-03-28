@@ -1,0 +1,11 @@
+version: "3"
+services:
+  tronscan_bot_service:
+    build: .
+    command: python main.py
+    volumes:
+      - .:/code
+    ports:
+      - "9998:9998"
+    env_file:
+      - .env

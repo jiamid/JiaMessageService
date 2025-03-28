@@ -1,0 +1,5 @@
+BOT_TOKEN=your_bot_token
+BASE_WEBHOOK_URL=https://xxx.xxx.xxx
+WEBHOOK_PATH=/path/to/webhook
+SECRET_TOKEN=xxxxx
+PASSWORD=xxxxx
