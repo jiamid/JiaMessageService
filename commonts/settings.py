@@ -20,8 +20,8 @@ class Settings(BaseSettings):
     password: str = 'jiamid'
     secret_token: str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'  # Additional security token for webhook
     tronscan_api_key: str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    redis_broker:str = 'redis://localhost:6379/0'
-    redis_backend:str = 'redis://localhost:6379/0'
+    celery_broker:str = 'redis://localhost:6379/0'
+    celery_backend:str = 'redis://localhost:6379/0'
 
 
 settings = Settings()

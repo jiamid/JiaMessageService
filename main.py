@@ -32,6 +32,8 @@ async def init_tg_webhook():
 @asynccontextmanager
 async def lifespan(application: FastAPI):
     logger.info("🚀 Starting Application")
+    if settings.debug:
+        logger.info(f"Docs http://127.0.0.1:{settings.port}/docs")
     # await init_tg_webhook()
     # await init_scheduler()
     yield

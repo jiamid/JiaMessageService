@@ -12,8 +12,8 @@ from commonts.settings import settings
 # 配置 Celery
 celery_app = Celery(
     'tasks',
-    broker=settings.redis_broker,
-    backend=settings.redis_backend
+    broker=settings.celery_broker,
+    backend=settings.celery_backend
 )
 
 

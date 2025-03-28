@@ -21,5 +21,6 @@ class TaskResponse(BaseResponseModel):
 
 @router.post('/add_task', response_model=TaskResponse)
 async def add_task(a: int, b: int):
-    task_id = add.deta()
+    task_id = add.apply_async((a,b))
+    task_id = str(task_id)
     return TaskResponse(data=task_id)
