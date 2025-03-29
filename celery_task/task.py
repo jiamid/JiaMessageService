@@ -10,6 +10,7 @@ from celery import Celery
 from commonts.settings import settings
 from models.message import NewMessageModel
 from loguru import logger
+from celery_task.browser_manager.manager import browser_manager
 
 # 配置 Celery
 celery_app = Celery(
@@ -22,6 +23,8 @@ celery_app = Celery(
 
 # 创建异步任务
 @celery_app.task
-def send_msg(new_msg: NewMessageModel | dict):
+def send_msg(new_msg: dict):
     new_msg = NewMessageModel(**new_msg)
-    logger.info(f'SendMsgTo:{new_msg.phone_number},Msg:{new_msg.msg}')
+    browser_manager.detail_msg(new_msg.phone_number, new_msg.msg)
+    logger.info(f'ok')
+    return 'OK'

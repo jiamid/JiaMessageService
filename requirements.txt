@@ -12,3 +12,5 @@ requests~=2.32.0
 anyio~=4.3.0
 celery~=5.4.0
 redis~=5.2.1
+urllib3~=1.26.20
+DrissionPage~=4.1.0.18
