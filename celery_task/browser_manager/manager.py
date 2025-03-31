@@ -14,6 +14,8 @@ import platform
 import sys
 import time
 import random
+import traceback
+
 import urllib3
 from functools import wraps
 from loguru import logger
@@ -39,20 +41,21 @@ class BrowserManager:
         self.ads_api = AdsApi()
         self.browser_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-        self.running_browsers = {}
-        self.running_browsers_times = []
         self.task_index = 0
         self.max_browser_num = 2
         self.one_browser_max_task = 4
         if self.max_browser_num > len(self.browser_list):
             raise ValueError('允许运行浏览器数量大于实际浏览器数量!')
         self.browser_gen = self.gen_new_browser()
-        self.init_browsers()
+
+        self.running_browsers = {}
+        self.running_browsers_times = {}
 
     def init_browsers(self):
-        self.running_browsers_times = [0 for i in range(self.max_browser_num)]
+        self.running_browsers_times = {}
         for i in range(self.max_browser_num):
             self.running_browsers[i] = self.browser_gen.__next__()
+
 
     def gen_new_browser(self):
         while True:
@@ -60,16 +63,23 @@ class BrowserManager:
                 # cdp_url = self.ads_api.start_browser(browser_id)
                 # port = cdp_url.split(':')[-1]
                 # browser = Chromium(int(port))
-                browser = browser_id
-                yield browser
+                try:
+                    browser = browser_id
+                    logger.info(f'GenBrowserId:{browser_id}')
+                    yield browser
+                except Exception as e:
+                    logger.error(f'GenBrowseFail:ID_{browser_id},Error:{traceback.format_exc()}')
 
     def get_browser(self):
         self.task_index = self.task_index % self.max_browser_num
-        browser = self.running_browsers.get(self.task_index)
+        browser = self.running_browsers.get(self.task_index,None)
+        if browser is None:
+            browser = self.browser_gen.__next__()
+            self.running_browsers[self.task_index] = browser
         return browser
 
-    def commit(self,browser):
-        now_times = self.running_browsers_times[self.task_index] + 1
+    def commit(self, browser):
+        now_times = self.running_browsers_times.get(self.task_index,0) + 1
         self.running_browsers_times[self.task_index] = now_times
         if now_times == self.one_browser_max_task:
             # browser.close()
@@ -84,9 +94,10 @@ class BrowserManager:
         logger.info(f'Use {browser} SendMsg:{msg},To:{phone_number}')
         self.commit(browser)
 
+
 browser_manager = BrowserManager()
 
 if __name__ == '__main__':
     for x in range(1000):
         logger.info(f'Send Msg{x}')
-        browser_manager.detail_msg('123','hello')
+        browser_manager.detail_msg('123', 'hello')
