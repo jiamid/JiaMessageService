@@ -17,6 +17,18 @@ def send_msg(browser, phone_no, msg):
     tab.actions.key_up('ENTER')  # 输入按键名称
     tab.actions.key_up(Keys.ENTER)
 
+    # # 键入一段文本
+    # tab.actions.type('text')
+    #
+    # # 键入多段文本
+    # tab.actions.type(('ab', 'cd'))
+    #
+    # # 光标向左移动一位再键入文本
+    # tab.actions.type((Keys.LEFT, 'abc'))
+    #
+    # # 输入快捷键
+    # tab.actions.type(Keys.CTRL_A)
+
 
 if __name__ == '__main__':
     new_browser = Chromium()
