@@ -15,6 +15,7 @@ import requests
 
 from loguru import logger
 
+
 class JiaDecorator:
     """
     修饰器，用于控制同一请求速度，避免并发请求
@@ -66,7 +67,9 @@ class JiaDecorator:
                             raise ValueError(f"重试超过 {times} 次，最终失败") from e
                         logger.warning(f"第 {now_times} 次执行失败,睡眠:{sleep_time},Error:\n{traceback.format_exc()}")
                         time.sleep(sleep_time)
+
             return wrapper
+
         return decorator
 
 
@@ -118,12 +121,12 @@ class AdsApi:
         if res_data:
             logger.info(f'start_browser {res_data}')
             data = res_data.get('data', {})
-            cdp_url = None
             if data:
                 cdp_url = data.get('ws', {}).get('selenium', None)
-            return cdp_url
-        else:
-            return None
+                port = data.get('debug_port', None)
+                webdriver = data.get('webdriver', None)
+                return {'port': port, 'webdriver': webdriver}
+        return None
 
     @JiaDecorator.sync_timing_decorator
     def stop_browser(self, b_id):
@@ -141,4 +144,3 @@ class AdsApi:
             time.sleep(1)
             times -= 1
             logger.info(f'stop_browser {b_id} fail, try again')
-
