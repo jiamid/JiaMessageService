@@ -10,7 +10,17 @@ from celery_task.task import celery_app
 from commonts.logger import init_logging
 from celery_task.task import browser_manager
 
+def start_celery():
+    worker = celery_app.Worker(
+        hostname='worker_ads',
+        concurrency=1,
+        loglevel="info",
+        pool="solo"
+    )
+    worker.start()
+
 if __name__ == '__main__':
     init_logging('worker')
     browser_manager.init_browsers()
-    celery_app.worker_main(['worker', '--loglevel=info'])
+    #celery_app.worker_main(['worker', '--loglevel=info'])
+    start_celery()
