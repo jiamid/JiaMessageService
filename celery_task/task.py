@@ -10,7 +10,11 @@ from celery import Celery
 from commonts.settings import settings
 from models.message import NewMessageModel
 from loguru import logger
-from celery_task.browser_manager.manager import browser_manager
+from celery_task.browser_manager.manager import BrowserManager
+from config import get_config
+
+
+browser_manager = BrowserManager(get_config())
 
 # 配置 Celery
 celery_app = Celery(

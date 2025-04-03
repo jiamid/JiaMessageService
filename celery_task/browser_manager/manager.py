@@ -32,10 +32,9 @@ class BrowserManager:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def __init__(self):
+    def __init__(self,config:dict):
         self.ads_api = AdsApi()
-        self.browser_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-
+        self.browser_list = config.get('ads_ids')
         self.task_index = 0
         self.max_browser_num = 2
         self.one_browser_max_task = 4
@@ -113,9 +112,10 @@ class BrowserManager:
         self.commit()
 
 
-browser_manager = BrowserManager()
 
 if __name__ == '__main__':
+    from config import get_config
+    browser_manager = BrowserManager(get_config())
     for x in range(1000):
         logger.info(f'Send Msg{x}')
         browser_manager.detail_msg('123', 'hello')
