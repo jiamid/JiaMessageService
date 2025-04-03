@@ -9,5 +9,5 @@
 from pydantic import BaseModel,Field
 
 class NewMessageModel(BaseModel):
-    phone_number:str
-    msg:str
+    phone_number:str=Field()
+    msg:str=Field(default='')

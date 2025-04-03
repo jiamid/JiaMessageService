@@ -29,6 +29,8 @@ celery_app = Celery(
 @celery_app.task
 def send_msg(new_msg: dict):
     new_msg = NewMessageModel(**new_msg)
-    browser_manager.detail_msg(new_msg.phone_number, new_msg.msg)
-    logger.info(f'ok')
+    config = get_config()
+    message = config.get('message')
+    browser_manager.detail_msg(new_msg.phone_number, message)
+    logger.info(f'send message {new_msg.phone_number},{message}')
     return 'OK'
