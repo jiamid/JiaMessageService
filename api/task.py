@@ -22,6 +22,7 @@ class TaskResponse(BaseResponseModel):
 
 @router.post('/add_task', response_model=TaskResponse)
 async def add_task(new_msg:NewMessageModel):
+    logger.info(f'shoudao:{new_msg}')
     task_id = send_msg.apply_async(kwargs={'new_msg':new_msg.model_dump()})
     task_id = str(task_id)
     return TaskResponse(data=task_id)
