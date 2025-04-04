@@ -36,7 +36,7 @@ class BrowserManager:
         self.ads_api = AdsApi()
         self.browser_list = config.get('ads_ids')
         self.task_index = 0
-        self.max_browser_num = 2
+        self.max_browser_num = 1
         self.one_browser_max_task = 4
         if self.max_browser_num > len(self.browser_list):
             raise ValueError('允许运行浏览器数量大于实际浏览器数量!')
@@ -100,13 +100,15 @@ class BrowserManager:
         browser = browser_info.get('browser')
         tab = browser.latest_tab
         tab.get(f"https://web.whatsapp.com/send?phone={phone_number}")
-        time.sleep(2)
+        time.sleep(3)
         ele_input = 'xpath://div[@id="main"]//div[@role="textbox"]'
-        e = tab.ele(ele_input, timeout=15)
+        e = tab.ele(ele_input, timeout=25)
         e.input(f'{msg}\n')
         logger.info(f'Use {b_id} SendMsg:{msg},To:{phone_number}')
 
-    def detail_msg(self, phone_number, msg):
+    def detail_msg(self, phone_number:str, msg):
+        if phone_number.startswith('00'):
+            phone_number = phone_number[2:]
         browser_info = self.get_browser()
         self.send_msg(browser_info, phone_number, msg)
         self.commit()
