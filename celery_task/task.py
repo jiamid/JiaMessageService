@@ -32,7 +32,7 @@ def send_msg(new_msg: dict):
     config = get_config()
     default_message = config.get('message')
     message = default_message
-    if new_msg.msg == '':
+    if new_msg.msg != '':
         message = new_msg.msg
     browser_manager.detail_msg(new_msg.phone_number, message)
     logger.info(f'send message {new_msg.phone_number},{message}')
