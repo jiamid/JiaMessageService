@@ -7,10 +7,8 @@
 @time: 2025/3/30 21:23
 """
 import time
-
 from DrissionPage import ChromiumOptions, Chromium
-from DrissionPage.common import Keys
-from celery_task.browser_manager.api import AdsApi
+from browser_manager.api import AdsApi
 
 
 # cdp_url = self.ads_api.start_browser(browser_id)

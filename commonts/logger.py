@@ -55,7 +55,7 @@ def format_record(record: dict) -> str:
     return format_string
 
 
-def init_logging(file_name: str = 'bot_service'):
+def init_logging(file_name: str = 'logger'):
     intercept_handler = InterceptHandler()
     logging.root.setLevel(25)
 
@@ -80,7 +80,7 @@ def init_logging(file_name: str = 'bot_service'):
         {'sink': sys.stdout,
          'level': 0,
          'format': format_record},
-        {'sink': f'{log_dir}/error/{file_name}_error.log',
+        {'sink': f'{log_dir}/{file_name}_error.log',
          'level': 'ERROR',
          'format': format_record,
          'enqueue': True,

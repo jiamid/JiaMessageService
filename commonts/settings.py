@@ -14,14 +14,8 @@ class Settings(BaseSettings):
 
     debug: bool = True
     port: int = 9998
-    bot_token: str = '1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    base_webhook_url: str = 'https://my.host.name'
-    webhook_path: str = '/path/to/webhook'
-    password: str = 'jiamid'
-    secret_token: str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'  # Additional security token for webhook
-    tronscan_api_key: str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    celery_broker:str = 'redis://localhost:6379/0'
-    celery_backend:str = 'redis://localhost:6379/0'
+    db_name: str = 'message_db'
+    secret_token: str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 
 settings = Settings()

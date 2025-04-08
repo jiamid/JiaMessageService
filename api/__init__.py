@@ -5,9 +5,9 @@
 # @File    : __init__.py.py
 # @Software: PyCharm
 from fastapi import APIRouter
-from api.bot_webhook import router as bot_router
-from api.task import router as task_router
+from api.message import router as msg_router
+from api.html import router as index_router
 
 router = APIRouter()
-router.include_router(bot_router)
-router.include_router(task_router)
+router.include_router(index_router)
+router.include_router(msg_router)

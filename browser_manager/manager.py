@@ -17,7 +17,7 @@ import random
 import traceback
 import urllib3
 from loguru import logger
-from celery_task.browser_manager.api import AdsApi
+from browser_manager.api import AdsApi
 from DrissionPage import ChromiumOptions, Chromium
 
 urllib3.disable_warnings()
