@@ -10,6 +10,7 @@ from enum import IntEnum
 from pydantic import BaseModel, Field
 from datetime import datetime
 
+
 class MessageStatusType(IntEnum):
     Pending = 1
     Running = 2
@@ -21,6 +22,10 @@ class MessageModel(BaseModel):
     session_id: str = Field()
     phone_number: str = Field()
     msg: str = Field()
+
+
+class SendMessageModel(MessageModel):
+    chat_id: str = Field()
 
 
 class FullMessageModel(MessageModel):

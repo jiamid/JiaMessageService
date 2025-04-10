@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>消息管理</title>
+    <title>浏览器管理</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
@@ -21,18 +21,53 @@
                 <option value="1">Pending</option>
                 <option value="2">Running</option>
                 <option value="3">Error</option>
-                <option value="4">Success</option>
             </select>
-            <button onclick="fetchMessages(0)">查询</button>
+            <button onclick="fetchBrowser(0)">查询</button>
+            <button onclick="showAddBrowserDialog()">添加浏览器</button>
         </div>
-        <div id="message-list" class="message-list"></div>
-        <div id="message-total" class="pagination"></div>
+        <div id="browser-list" class="table-list">
+            <table id="browser-table">
+                <colgroup>
+                    <col style="width: 10%;">
+                    <col style="width: 10%;">
+                    <col style="width: 15%;">
+                    <col style="width: 30%;">
+                    <col style="width: 10%;">
+
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>BrowserId</th>
+                    <th>Status</th>
+                    <th>LastUsedAt</th>
+                    <th>Detail</th>
+                    <th>Reset</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div id="total" class="pagination"></div>
         <div id="pagination" class="pagination"></div>
     </div>
+
+    <!-- 弹出框 -->
+    <div id="add-browser-dialog" style="display:none;">
+        <div class="dialog-overlay">
+            <div class="dialog-content">
+                <h3>添加浏览器</h3>
+                <label for="browser-id-input">浏览器ID</label>
+                <input type="text" id="browser-id-input">
+                <button onclick="addBrowser()">添加</button>
+                <button onclick="closeAddBrowserDialog()">关闭</button>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
-    const pageSize = 4;
+    const pageSize = 100;
     let currentPage = 0;
 
     const statusMap = {
@@ -42,28 +77,27 @@
         4:'Success',
     };
 
-    async function fetchMessages(page) {
+    async function fetchBrowser(page) {
         currentPage = page;
         const status = document.getElementById("status").value;
-        const res = await fetch(`/get_msg_page?page=${page}&size=${pageSize}&status=${status}`);
+        const res = await fetch(`/get_browser_page?page=${page}&size=${pageSize}&status=${status}`);
         const json = await res.json();
 
-        const list = document.getElementById("message-list");
+        const list = document.getElementById("browser-list").querySelector("tbody");
         list.innerHTML = "";
-        json.data.messages.forEach(msg => {
-            const div = document.createElement("div");
-            div.classList.add("msg-box");
-            const statusStr = statusMap[msg.status] ?? msg.status;
-            div.innerHTML = `
-                <p><strong>Session:</strong> ${msg.session_id}</p>
-                <p><strong>Phone:</strong> ${msg.phone_number}</p>
-                <p><strong>Msg:</strong> ${msg.msg}</p>
-                <p><strong>Status:</strong> ${statusStr}</p>
-                <p><strong>Created At:</strong> ${msg.created_at}</p>
+        json.data.browsers.forEach(browser => {
+            const tr = document.createElement("tr");
+            const statusStr = statusMap[browser.status] ?? browser.status;
+            tr.innerHTML = `
+                <td>${browser.browser_id}</td>
+                <td>${statusStr}</td>
+                <td>${browser.last_used_at}</td>
+                <td>${browser.detail}</td>
+                <td><button onclick="confirmReset('${browser.browser_id}')">重置</button></td>
             `;
-            list.appendChild(div);
+            list.appendChild(tr);
         });
-        const totalDiv = document.getElementById("message-total");
+        const totalDiv = document.getElementById("total");
         totalDiv.innerHTML = `总数:${json.data.count}`;
         const totalPages = Math.ceil(json.data.count / json.data.size);
         const pagination = document.getElementById("pagination");
@@ -77,9 +111,72 @@
         }
     }
 
+    // 弹出确认框
+    function confirmReset(browserId) {
+        const isConfirmed = window.confirm(`你确定要将${browserId}状态重置为Pending吗？`);
+        if (isConfirmed) {
+            resetBrowserStatus(browserId, 5);
+        }
+    }
+
+    async function resetBrowserStatus(browserId, status) {
+        const res = await fetch('/update_browser_status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                browser_id: browserId,
+                status: 5
+            })
+        });
+        if (res.ok) {
+            fetchBrowser(currentPage);  // 更新页面
+        } else {
+            alert('状态重置失败');
+        }
+    }
+
+    // 显示添加浏览器对话框
+    function showAddBrowserDialog() {
+        document.getElementById("add-browser-dialog").style.display = 'block';
+    }
+
+    // 关闭添加浏览器对话框
+    function closeAddBrowserDialog() {
+        document.getElementById("add-browser-dialog").style.display = 'none';
+    }
+    // 添加浏览器
+    async function addBrowser() {
+        const browserId = document.getElementById("browser-id-input").value;
+
+        if (!browserId) {
+            alert('浏览器 ID 不能为空');
+            return;
+        }
+
+        const res = await fetch('/add_browser', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                browser_id: browserId
+            })
+        });
+
+        if (res.ok) {
+            fetchBrowser(currentPage);  // 更新页面
+            closeAddBrowserDialog();  // 关闭对话框
+        } else {
+            alert('添加浏览器失败');
+        }
+    }
+
+
     // 初始化加载
     window.onload = () => {
-        fetchMessages(0);
+        fetchBrowser(0);
     };
 </script>
 </body>

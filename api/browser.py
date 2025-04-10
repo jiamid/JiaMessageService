@@ -17,8 +17,6 @@ from db.curd import DbService
 router = APIRouter()
 
 
-
-
 @router.post('/add_browser', response_model=BaseResponseModel)
 async def add_browser(new: BrowserModel):
     db = DbService()
@@ -30,23 +28,24 @@ async def add_browser(new: BrowserModel):
 
 
 class PageResponse(BaseResponseModel):
-    data: MessagePageModel
+    data: BrowserPageModel
 
 
-@router.get('/get_msg_page', response_model=PageResponse)
-async def get_msg_page(page: int = 0, size: int = 10, status: int = 0):
+@router.get('/get_browser_page', response_model=PageResponse)
+async def get_browser_page(page: int = 0, size: int = 10, status: int = 0):
     db = DbService()
-    data = db.get_message_page(page, size, status)
+    data = db.get_browser_page(page, size, status)
     return PageResponse(data=data)
 
 
-class UpdateMessage(BaseModel):
-    session_id: str
+class UpdateBrowser(BaseModel):
+    browser_id: str
     status: int
+    detail: str = ''
 
 
-@router.post('/update_msg_page', response_model=BaseResponseModel)
-async def update_msg_page(update_msg: UpdateMessage):
+@router.post('/update_browser_status', response_model=BaseResponseModel)
+async def update_browser_status(update_data: UpdateBrowser):
     db = DbService()
-    db.update_message_status(update_msg.session_id, update_msg.status)
+    db.update_browser_status(update_data.browser_id, update_data.status,update_data.detail)
     return BaseResponseModel()

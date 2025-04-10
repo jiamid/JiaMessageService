@@ -6,6 +6,7 @@
 @file: curd.py
 @time: 2025/3/4 12:13
 """
+import time
 from typing import List
 from sqlalchemy.orm import Session
 from sqlalchemy.dialects.mysql import insert
@@ -93,13 +94,19 @@ class DbService:
                 MessageTable.status: status
             })
 
-    def update_browser_status(self, browser_id: str, status: int):
+    def update_browser_status(self, browser_id: str, status: int, detail: str):
+        if status == 5:
+            status = 1
+            last_used_at = 0
+        else:
+            last_used_at = int(time.time())
         with self.get_session() as session:
             session.query(BrowserTable).filter(
                 BrowserTable.browser_id == browser_id
             ).update({
                 BrowserTable.status: status,
-                BrowserTable.last_used_at: 0
+                BrowserTable.last_used_at: last_used_at,
+                BrowserTable.detail: detail
             })
 
     def delete_message_by_id(self, session_id: int):

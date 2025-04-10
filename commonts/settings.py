@@ -5,6 +5,7 @@
 # @File    : settings.py
 # @Software: PyCharm
 from pydantic_settings import BaseSettings, SettingsConfigDict
+import base64
 
 
 class Settings(BaseSettings):
@@ -16,8 +17,10 @@ class Settings(BaseSettings):
     port: int = 9998
     db_name: str = 'message_db'
     secret_token: str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    bot_token: str = 'ODEwMTk5MjQ5NzpBQUhWWXZhMFRhR180Q3Y3cWtYdko1NXBpZkRaWEp5aXpZWQ=='
+
+    def get_bot_token(self):
+        return base64.b64decode(self.bot_token.encode()).decode()
 
 
 settings = Settings()
-print(settings)
-

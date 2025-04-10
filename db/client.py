@@ -28,7 +28,7 @@ Base = declarative_base()
 
 
 # 数据模型
-class BrowserTableMessageTable(Base):
+class MessageTable(Base):
     __tablename__ = 'message'
 
     session_id = Column(String, primary_key=True, index=True)
@@ -44,7 +44,7 @@ class BrowserTable(Base):
     browser_id = Column(String, primary_key=True, index=True)
     detail = Column(String, default='')
     status = Column(Integer, default=1)  # 1正常 2使用中 3异常
-    last_used_at = Column(TIMESTAMP, default=0)
+    last_used_at = Column(BigInteger, default=0)
     created_at = Column(TIMESTAMP, nullable=False, server_default=func.now())
 
 

@@ -25,14 +25,34 @@
             </select>
             <button onclick="fetchMessages(0)">查询</button>
         </div>
-        <div id="message-list" class="message-list"></div>
-        <div id="message-total" class="pagination"></div>
+        <div id="message-list" class="table-list">
+            <table id="message-table">
+                <colgroup>
+                    <col style="width: 10%;">
+                    <col style="width: 10%;">
+                    <col style="width: 10%;">
+                    <col style="width: 30%;">
+                    <col style="width: 20%;">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>Session</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th>Msg</th>
+                    <th>CreatedAt</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div id="total" class="pagination"></div>
         <div id="pagination" class="pagination"></div>
     </div>
 </div>
 
 <script>
-    const pageSize = 4;
+    const pageSize = 100;
     let currentPage = 0;
 
     const statusMap = {
@@ -48,22 +68,21 @@
         const res = await fetch(`/get_msg_page?page=${page}&size=${pageSize}&status=${status}`);
         const json = await res.json();
 
-        const list = document.getElementById("message-list");
+        const list = document.getElementById("message-list").querySelector("tbody");
         list.innerHTML = "";
         json.data.messages.forEach(msg => {
-            const div = document.createElement("div");
-            div.classList.add("msg-box");
+            const tr = document.createElement("tr");
             const statusStr = statusMap[msg.status] ?? msg.status;
-            div.innerHTML = `
-                <p><strong>Session:</strong> ${msg.session_id}</p>
-                <p><strong>Phone:</strong> ${msg.phone_number}</p>
-                <p><strong>Msg:</strong> ${msg.msg}</p>
-                <p><strong>Status:</strong> ${statusStr}</p>
-                <p><strong>Created At:</strong> ${msg.created_at}</p>
+            tr.innerHTML = `
+                <td>${msg.session_id}</td>
+                <td>${msg.phone_number}</td>
+                <td>${statusStr}</td>
+                <td>${msg.msg}</td>
+                <td>${msg.created_at}</td>
             `;
-            list.appendChild(div);
+            list.appendChild(tr);
         });
-        const totalDiv = document.getElementById("message-total");
+        const totalDiv = document.getElementById("total");
         totalDiv.innerHTML = `总数:${json.data.count}`;
         const totalPages = Math.ceil(json.data.count / json.data.size);
         const pagination = document.getElementById("pagination");
