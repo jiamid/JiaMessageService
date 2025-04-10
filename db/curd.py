@@ -120,3 +120,23 @@ class DbService:
             session.query(BrowserTable).filter(
                 BrowserTable.browser_id == browser_id
             ).delete()
+
+    def get_one_pending_message(self):
+        with self.get_session() as session:
+            pending_one = session.query(MessageTable).filter(
+                MessageTable.status == 1
+            ).order_by(MessageTable.created_at.asc()).first()
+            if pending_one:
+                new_one = FullMessageModel.model_validate(pending_one)
+                return new_one
+        return None
+
+    def get_one_pending_browser(self):
+        with self.get_session() as session:
+            pending_one = session.query(BrowserTable).filter(
+                BrowserTable.status == 1
+            ).order_by(BrowserTable.last_used_at.asc()).first()
+            if pending_one:
+                new_one = FullBrowserModel.model_validate(pending_one)
+                return new_one
+        return None

@@ -88,10 +88,11 @@
         json.data.browsers.forEach(browser => {
             const tr = document.createElement("tr");
             const statusStr = statusMap[browser.status] ?? browser.status;
+            const lastUsedTime = (new Date(browser.last_used_at*1000)).toLocaleString();
             tr.innerHTML = `
                 <td>${browser.browser_id}</td>
                 <td>${statusStr}</td>
-                <td>${browser.last_used_at}</td>
+                <td>${lastUsedTime}</td>
                 <td>${browser.detail}</td>
                 <td><button onclick="confirmReset('${browser.browser_id}')">重置</button></td>
             `;

@@ -11,7 +11,7 @@ from loguru import logger
 from commonts.settings import settings
 from pydantic import BaseModel
 from models.base_model import BaseResponseModel
-from models.browser import BrowserPageModel, BrowserModel
+from models.browser import BrowserPageModel, BrowserModel, FullBrowserModel
 from db.curd import DbService
 
 router = APIRouter()
@@ -47,5 +47,16 @@ class UpdateBrowser(BaseModel):
 @router.post('/update_browser_status', response_model=BaseResponseModel)
 async def update_browser_status(update_data: UpdateBrowser):
     db = DbService()
-    db.update_browser_status(update_data.browser_id, update_data.status,update_data.detail)
+    db.update_browser_status(update_data.browser_id, update_data.status, update_data.detail)
     return BaseResponseModel()
+
+
+class PendingBrowserResponse(BaseResponseModel):
+    data: FullBrowserModel | None
+
+
+@router.get('/get_pending_browser', response_model=PendingBrowserResponse)
+async def get_pending_browser():
+    db = DbService()
+    one = db.get_one_pending_browser()
+    return PendingBrowserResponse(data=one)

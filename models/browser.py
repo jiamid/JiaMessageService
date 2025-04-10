@@ -25,7 +25,7 @@ class FullBrowserModel(BrowserModel):
     status: int = Field()
     detail: str = Field()
     created_at: datetime = Field()
-    last_used_at: datetime = Field()
+    last_used_at: int = Field()
 
     class Config:
         from_attributes = True

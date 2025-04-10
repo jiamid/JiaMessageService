@@ -6,16 +6,12 @@
 @file: manager.py
 @time: 2025/3/29 08:19
 """
-import asyncio
-import json
-import multiprocessing
-import os
-import platform
-import sys
+
 import time
 import random
 import traceback
 import urllib3
+import requests
 from loguru import logger
 from browser_manager.api import AdsApi
 from DrissionPage import ChromiumOptions, Chromium
@@ -32,16 +28,15 @@ class BrowserManager:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def __init__(self,config:dict):
+    def __init__(self, api_pre, max_browser_num: int = 1):
+        self.api_pre = api_pre
         self.ads_api = AdsApi()
-        self.browser_list = config.get('ads_ids')
-        self.task_index = 0
-        self.max_browser_num = 1
+
+        self.max_browser_num = max_browser_num
         self.one_browser_max_task = 4
-        if self.max_browser_num > len(self.browser_list):
-            raise ValueError('允许运行浏览器数量大于实际浏览器数量!')
         self.browser_gen = self.gen_new_browser()
 
+        self.task_index = 0
         self.running_browsers = {}
         self.running_browsers_times = {}
 
@@ -50,10 +45,51 @@ class BrowserManager:
         for i in range(self.max_browser_num):
             self.running_browsers[i] = self.browser_gen.__next__()
 
+    def update_message_status(self, session_id: str, status: int):
+        api = f'{self.api_pre}/update_browser_status'
+        body = {
+            'session_id': session_id,
+            'status': status
+        }
+        resp = requests.post(api, json=body)
+        logger.info(resp)
+
+    def get_pending_message(self):
+        api = f'{self.api_pre}/get_pending_message'
+        resp = requests.get(api)
+        data = resp.json()
+        message_info = data.get('data', None)
+        return message_info
+
+    def update_browser_status(self, browser_id: str, status: int, detail: str = ''):
+        api = f'{self.api_pre}/update_browser_status'
+        body = {
+            'browser_id': browser_id,
+            'status': status
+        }
+        resp = requests.post(api, json=body)
+        logger.info(resp)
+
+    def get_pending_browser(self):
+        api = f'{self.api_pre}/get_pending_browser'
+        resp = requests.get(api)
+        data = resp.json()
+        browser_info = data.get('data', None)
+        if browser_info:
+            browser_id = browser_info.get('browser_id')
+            last_used_at = browser_info.get('last_used_at')
+            now = time.time()
+            if last_used_at + (3600 * 8) < now:
+                self.update_browser_status(browser_id, 2)
+                return browser_id
+        logger.warning(f'空闲浏览器不足')
+        return None
+
     def gen_new_browser(self):
         while True:
-            for browser_id in self.browser_list:
-                try:
+            browser_id = self.get_pending_browser()
+            try:
+                if browser_id:
                     browser_data = self.ads_api.start_browser(browser_id)
                     if not browser_data:
                         continue
@@ -66,12 +102,18 @@ class BrowserManager:
                         'id': browser_id,
                         'browser': new_browser
                     }
-                except Exception as e:
-                    logger.error(f'GenBrowseFail:ID_{browser_id},Error:{traceback.format_exc()}')
+                else:
+                    logger.info(f'无空闲浏览器睡眠10s')
+                    time.sleep(10)
+            except Exception as e:
+                self.update_browser_status(browser_id, 3, str(e))
+                logger.error(f'GenBrowseFail:ID_{browser_id},Error:{traceback.format_exc()}')
 
-    def close_browser(self, index):
+    def close_browser(self, index, status=1, detail=''):
         browser_info = self.running_browsers.get(index)
         if browser_info:
+            browser_id = browser_info.get('id')
+            self.update_browser_status(browser_id, status, detail)
             self.ads_api.stop_browser(browser_info.get('id'))
             logger.info(f'关闭浏览器ID{browser_info.get('id')}')
 
@@ -83,13 +125,13 @@ class BrowserManager:
             self.running_browsers[self.task_index] = browser
         return browser
 
-    def commit(self):
+    def commit(self, status=1, detail=''):
         now_times = self.running_browsers_times.get(self.task_index, 0) + 1
         self.running_browsers_times[self.task_index] = now_times
         if now_times == self.one_browser_max_task:
             # browser.close()
             logger.info(f'关闭浏览器{self.task_index}')
-            self.close_browser(self.task_index)
+            self.close_browser(self.task_index, status, detail)
             self.running_browsers[self.task_index] = self.browser_gen.__next__()
             self.running_browsers_times[self.task_index] = 0
             logger.info(f'更新第{self.task_index}浏览器')
@@ -106,18 +148,45 @@ class BrowserManager:
         e.input(f'{msg}\n')
         logger.info(f'Use {b_id} SendMsg:{msg},To:{phone_number}')
 
-    def detail_msg(self, phone_number:str, msg):
+    def detail_msg(self, phone_number: str, msg):
         if phone_number.startswith('00'):
             phone_number = phone_number[2:]
         browser_info = self.get_browser()
-        self.send_msg(browser_info, phone_number, msg)
-        self.commit()
+        status = 1
+        detail = ''
+        try:
+            self.send_msg(browser_info, phone_number, msg)
+        except Exception as e:
+            status = 3
+            detail = f'{e.__str__()}'
+        self.commit(status, detail)
+        return True if status == 1 else False
+
+    def run(self):
+        while True:
+            message_info = self.get_pending_message()
+            if message_info:
+                session_id = message_info.get('session_id')
+                msg = message_info.get('msg')
+                phone_number = message_info.get('phone_number')
+                try:
+                    self.update_message_status(session_id,2)
+                    do_status =self.detail_msg(phone_number, msg)
+                    if do_status:
+                        self.update_message_status(session_id,4)
+                    else:
+                        self.update_message_status(session_id, 3)
+                except Exception as e:
+                    logger.error(f'SendMsgError:{e}')
+                    self.update_message_status(session_id, 3)
+            else:
+                logger.info(f'暂无消息，睡眠10s')
+                time.sleep(10)
+
 
 
 
 if __name__ == '__main__':
-    from config import get_config
-    browser_manager = BrowserManager(get_config())
-    for x in range(1000):
-        logger.info(f'Send Msg{x}')
-        browser_manager.detail_msg('123', 'hello')
+    api_pre = 'http://127.0.0.1:9998'
+    browser_manager = BrowserManager(api_pre)
+    browser_manager.run()

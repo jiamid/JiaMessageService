@@ -11,7 +11,7 @@ from loguru import logger
 from commonts.settings import settings
 from pydantic import BaseModel
 from models.base_model import BaseResponseModel
-from models.message import MessageModel, MessagePageModel, SendMessageModel
+from models.message import MessageModel, MessagePageModel, SendMessageModel, FullMessageModel
 from db.curd import DbService
 from tg_bot.bot import send_message_to_bot
 
@@ -54,3 +54,13 @@ async def update_msg_status(update_msg: UpdateMessage):
     db = DbService()
     db.update_message_status(update_msg.session_id, update_msg.status)
     return BaseResponseModel()
+
+class PendingMessageResponse(BaseResponseModel):
+    data: FullMessageModel | None
+
+
+@router.get('/get_pending_message', response_model=PendingMessageResponse)
+async def get_pending_message():
+    db = DbService()
+    one = db.get_one_pending_message()
+    return PendingMessageResponse(data=one)

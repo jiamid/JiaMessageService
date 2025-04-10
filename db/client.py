@@ -34,7 +34,7 @@ class MessageTable(Base):
     session_id = Column(String, primary_key=True, index=True)
     phone_number = Column(String)
     msg = Column(String)
-    status = Column(Integer, default=1)
+    status = Column(Integer, default=1)# Pending = 1 Running = 2 Error = 3 Success = 4
     created_at = Column(TIMESTAMP, nullable=False, server_default=func.now())
 
 
