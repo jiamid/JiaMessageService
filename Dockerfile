@@ -11,4 +11,3 @@ RUN rm -f /etc/localtime
 RUN  ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' > /etc/timezone
 
 COPY . /code/
-WORKDIR /code/src
