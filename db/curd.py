@@ -42,7 +42,10 @@ class DbService:
             if old:
                 logger.info(f'Message:{new.session_id}已存在')
                 return
-            session.add(MessageTable(**data))
+            status = 1
+            if new.msg == '':
+                status = 4
+            session.add(MessageTable(**data,status=status))
 
     def create_browser(self, new: BrowserModel):
         with self.get_session() as session:

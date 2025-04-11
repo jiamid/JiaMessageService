@@ -21,7 +21,7 @@ class MessageStatusType(IntEnum):
 class MessageModel(BaseModel):
     session_id: str = Field()
     phone_number: str = Field()
-    msg: str = Field()
+    msg: str = Field(default='')
     chat_id: str = Field(default='')
 
 
