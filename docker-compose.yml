@@ -1,0 +1,30 @@
+version: "3"
+services:
+  msg_src:
+    build: .
+    command: python main.py
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"      # 设置单个日志文件的最大大小
+        max-file: "3"        # 设置最多保留的日志文件数量
+    volumes:
+      - .:/code
+    env_file:
+      - .env
+
+  tg_bot:
+    build: .
+    command: python run_tg_bot.py
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"      # 设置单个日志文件的最大大小
+        max-file: "3"        # 设置最多保留的日志文件数量
+    volumes:
+      - .:/code
+    env_file:
+      - .env
+

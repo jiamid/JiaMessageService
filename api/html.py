@@ -13,6 +13,9 @@ from fastapi.templating import Jinja2Templates
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
+@router.get("/", response_class=RedirectResponse)
+async def index(request: Request):
+    return RedirectResponse(url='/message',status_code=302)
 
 @router.get("/message", response_class=HTMLResponse)
 async def go_message(request: Request):
