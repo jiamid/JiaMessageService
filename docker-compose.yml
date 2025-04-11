@@ -11,6 +11,8 @@ services:
         max-file: "3"        # 设置最多保留的日志文件数量
     volumes:
       - .:/code
+    ports:
+      - "9998:9998"
     env_file:
       - .env
 
