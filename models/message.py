@@ -22,10 +22,11 @@ class MessageModel(BaseModel):
     session_id: str = Field()
     phone_number: str = Field()
     msg: str = Field()
+    chat_id: str = Field(default='')
 
 
 class SendMessageModel(MessageModel):
-    chat_id: str = Field()
+    pass
 
 
 class FullMessageModel(MessageModel):

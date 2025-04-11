@@ -15,7 +15,7 @@ from db.client import SessionLocal
 from contextlib import contextmanager
 from db.client import MessageTable, BrowserTable
 
-from models.message import MessageModel, FullMessageModel, MessagePageModel
+from models.message import MessageModel, FullMessageModel, MessagePageModel,SendMessageModel
 from models.browser import BrowserModel, FullBrowserModel, BrowserPageModel
 
 
@@ -35,7 +35,7 @@ class DbService:
         finally:
             session.close()
 
-    def create_message(self, new: MessageModel):
+    def create_message(self, new: SendMessageModel):
         with self.get_session() as session:
             data = new.model_dump()
             old = session.query(MessageTable).filter(MessageTable.session_id == new.session_id).first()
