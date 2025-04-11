@@ -1,6 +1,6 @@
 version: "3"
 services:
-  msg_src:
+  msg_srv:
     build: .
     command: python main.py
     restart: always
