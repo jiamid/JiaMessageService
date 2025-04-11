@@ -46,7 +46,7 @@ class BrowserManager:
             self.running_browsers[i] = self.browser_gen.__next__()
 
     def update_message_status(self, session_id: str, status: int):
-        api = f'{self.api_pre}/update_browser_status'
+        api = f'{self.api_pre}/update_message_status'
         body = {
             'session_id': session_id,
             'status': status
