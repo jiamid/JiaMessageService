@@ -17,8 +17,8 @@ class Settings(BaseSettings):
     port: int = 9998
     db_name: str = 'message_db'
     bot_token: str = 'ODEwMTk5MjQ5NzpBQUhWWXZhMFRhR180Q3Y3cWtYdko1NXBpZkRaWEp5aXpZWQ=='
-    worker_chat_id = 'all'
-    worker_api_pre = 'http://43.160.195.19'
+    worker_chat_id: str = 'all'
+    worker_api_pre: str = 'http://43.160.195.19'
 
     def get_bot_token(self):
         return base64.b64decode(self.bot_token.encode()).decode()
