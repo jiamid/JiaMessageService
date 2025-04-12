@@ -118,7 +118,7 @@
     }
 
     function exportCSV() {
-        const date = document.getElementById('exportDate').value;
+    const date = document.getElementById('exportDate').value;
         if (!date) {
             alert('请选择日期');
             return;
@@ -126,16 +126,14 @@
 
         const [year, month, day] = date.split('-');
         const url = `/export_csv/{{ chat_id }}/${year}_${month}_${day}.csv`;
-        // 创建隐藏的iframe来触发下载
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = url;
-        document.body.appendChild(iframe);
 
-        // 移除iframe
-        setTimeout(() => {
-            document.body.removeChild(iframe);
-        }, 100);
+        // 在新标签页打开下载链接
+        const downloadWindow = window.open(url, '_blank');
+
+        // 如果浏览器阻止了弹出窗口，提示用户手动下载
+        if (!downloadWindow || downloadWindow.closed || typeof downloadWindow.closed === 'undefined') {
+            alert('下载窗口被阻止，请允许弹出窗口或手动访问以下链接:\n' + url);
+        }
 
         closeExportCsvDialog();
     }
