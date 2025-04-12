@@ -9,7 +9,7 @@
 1. 到Tccc后台配置电话接听按键等规则
 2. 配置用户按键触发API Call
 ```
-接口请求地址: http://43.160.195.19/send_msg
+接口请求地址: https://lambopro.net/send_msg
 ```
 
 |字段名|参数值|
@@ -20,6 +20,9 @@
 |msg|推广文案|
 
 ###### 三、管理后台
-1. 查看消息 http://43.160.195.19/message
-2. 管理浏览器 http://43.160.195.19/browser
+1. 访问 https://lambopro.net/
+2. 输入 步骤一获取的ChatId
+3. 左侧有菜单
+4. Message 查看收到的咨询信息
+5. Browser 查看配置的浏览器情况
 

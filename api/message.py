@@ -26,8 +26,8 @@ class SendResponse(BaseResponseModel):
 async def send_msg(new_msg: SendMessageModel, background_tasks: BackgroundTasks):
     db = DbService()
     db.create_message(SendMessageModel(**new_msg.model_dump()))
-    # background_tasks.add_task(send_message_to_bot, chat_id=new_msg.chat_id, text=f'收到咨询:{new_msg.phone_number}',
-    #                           parse_mode=None)
+    background_tasks.add_task(send_message_to_bot, chat_id=new_msg.chat_id, text=f'收到咨询:{new_msg.phone_number}',
+                              parse_mode=None)
     return SendResponse(data=new_msg.session_id)
 
 
