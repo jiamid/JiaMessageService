@@ -1,5 +1,2 @@
-BOT_TOKEN=your_bot_token
-BASE_WEBHOOK_URL=https://xxx.xxx.xxx
-WEBHOOK_PATH=/path/to/webhook
-SECRET_TOKEN=xxxxx
-PASSWORD=xxxxx
+WORKER_CHAT_ID=all
+WORKER_API_PRE=http://43.160.195.19
