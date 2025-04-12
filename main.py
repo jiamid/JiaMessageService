@@ -12,6 +12,8 @@ from contextlib import asynccontextmanager
 from api import router
 from fastapi.staticfiles import StaticFiles
 
+from fastapi.middleware.cors import CORSMiddleware
+
 
 async def init_scheduler():
     from commonts.scheduler_manager import scheduler_manager
@@ -33,9 +35,19 @@ app = FastAPI(lifespan=lifespan,
               docs_url='/docs' if settings.debug else None,
               redoc_url='/redoc' if settings.debug else None,
               )
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    # 添加以下配置防止头部冲突
+    expose_headers=["Content-Disposition"]
+)
+
 app.include_router(router)
 app.mount("/static", StaticFiles(directory="static"), name="static")
-
 
 if __name__ == '__main__':
     from uvicorn import run

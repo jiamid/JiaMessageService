@@ -25,6 +25,7 @@
                 <option value="4">Success</option>
             </select>
             <button onclick="fetchMessages(0)">查询</button>
+            <button onclick="showExportCsvDialog()" style="margin-left: auto;">导出</button>
         </div>
         <div id="message-list" class="table-list">
             <table id="message-table">
@@ -54,6 +55,22 @@
     </div>
 </div>
 
+
+<!-- 弹出框 -->
+<div id="export-csv-dialog" style="display:none;">
+    <div class="dialog-overlay">
+        <div class="dialog-content">
+            <h3>选择导出日期</h3>
+            <input type="date" id="exportDate">
+            <div>
+                <button onclick="exportCSV()">确认</button>
+                <button onclick="closeExportCsvDialog()">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script>
     const pageSize = 100;
     let currentPage = 0;
@@ -82,7 +99,7 @@
                 <td>${msg.chat_id}</td>
                 <td>${statusStr}</td>
                 <td>${msg.msg}</td>
-                <td>${msg.created_at}</td>
+                <td>${msg.created_at_str}</td>
             `;
             list.appendChild(tr);
         });
@@ -98,6 +115,39 @@
             btn.onclick = () => fetchMessages(i);
             pagination.appendChild(btn);
         }
+    }
+
+    function exportCSV() {
+        const date = document.getElementById('exportDate').value;
+        if (!date) {
+            alert('请选择日期');
+            return;
+        }
+
+        const [year, month, day] = date.split('-');
+        const url = `/export_csv/{{ chat_id }}/${year}_${month}_${day}.csv`;
+        // 创建隐藏的iframe来触发下载
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = url;
+        document.body.appendChild(iframe);
+
+        // 移除iframe
+        setTimeout(() => {
+            document.body.removeChild(iframe);
+        }, 100);
+
+        closeExportCsvDialog();
+    }
+    function closeExportCsvDialog() {
+        document.getElementById("export-csv-dialog").style.display = 'none';
+    }
+
+    function showExportCsvDialog() {
+        document.getElementById("export-csv-dialog").style.display = 'block';
+        // 设置默认日期为今天
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('exportDate').value = today;
     }
 
     // 初始化加载

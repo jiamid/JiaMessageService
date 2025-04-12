@@ -1,5 +1,6 @@
 aiogram
 aiohttp
+aiofiles
 fastapi~=0.115.6
 loguru~=0.7.2
 lxml~=5.2.2

@@ -7,6 +7,8 @@
 @time: 2025/3/4 12:13
 """
 import time
+from zoneinfo import ZoneInfo
+from datetime import datetime, timedelta
 from typing import List
 from sqlalchemy.orm import Session
 from sqlalchemy.dialects.mysql import insert
@@ -162,3 +164,21 @@ class DbService:
                 new_one = FullBrowserModel.model_validate(pending_one)
                 return new_one
         return None
+
+    def get_message_data_by_date(self, chat_id: str, year: int, month: int, day: int):
+        with self.get_session() as session:
+            query = session.query(MessageTable.session_id,MessageTable.phone_number,MessageTable.created_at)
+            this_day = datetime(year, month, day, tzinfo=ZoneInfo('Asia/Shanghai'))
+            filter_list = [
+                MessageTable.created_at >= this_day,
+                MessageTable.created_at < (this_day + timedelta(days=1)),
+            ]
+            if chat_id != 'all':
+                filter_list.append(MessageTable.chat_id == chat_id)
+            query = query.filter(*filter_list)
+            message_objs = query.all()
+            return [{
+                'session_id':msg[0],
+                'phone_number':msg[1],
+                'create_at':msg[2].replace(tzinfo=ZoneInfo('UTC')).astimezone(ZoneInfo('Asia/Shanghai')).strftime('%Y-%m-%d %H:%M:%S')
+            } for msg in message_objs]

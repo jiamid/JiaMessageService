@@ -7,8 +7,9 @@
 @time: 2025/3/28 19:02
 """
 from enum import IntEnum
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field,model_validator
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 
 class MessageStatusType(IntEnum):
@@ -32,6 +33,21 @@ class SendMessageModel(MessageModel):
 class FullMessageModel(MessageModel):
     status: int = Field()
     created_at: datetime = Field()
+    created_at_str:str = Field(default='')
+
+    @model_validator(mode='after')
+    def set_created_at_str(self) -> 'FullMessageModel':
+        """自动生成 UTC+8 时区的时间字符串"""
+        # 确保有时区信息（假设无时区的是UTC）
+        if self.created_at.tzinfo is None:
+            self.created_at = self.created_at.replace(tzinfo=ZoneInfo('UTC'))
+
+        # 转换为 UTC+8（如北京时间）
+        beijing_time = self.created_at.astimezone(ZoneInfo('Asia/Shanghai'))
+        self.created_at_str = beijing_time.strftime('%Y-%m-%d %H:%M:%S')
+
+        return self
+
 
     class Config:
         use_enum_values = True
