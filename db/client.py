@@ -42,7 +42,9 @@ class MessageTable(Base):
 class BrowserTable(Base):
     __tablename__ = 'browser'
 
-    browser_id = Column(String, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    browser_id = Column(String)
+    chat_id = Column(String)
     detail = Column(String, default='')
     status = Column(Integer, default=1)  # 1正常 2使用中 3异常
     last_used_at = Column(BigInteger, default=0)

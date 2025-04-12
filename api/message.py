@@ -26,8 +26,8 @@ class SendResponse(BaseResponseModel):
 async def send_msg(new_msg: SendMessageModel, background_tasks: BackgroundTasks):
     db = DbService()
     db.create_message(SendMessageModel(**new_msg.model_dump()))
-    background_tasks.add_task(send_message_to_bot, chat_id=new_msg.chat_id, text=f'收到咨询:{new_msg.phone_number}',
-                              parse_mode=None)
+    # background_tasks.add_task(send_message_to_bot, chat_id=new_msg.chat_id, text=f'收到咨询:{new_msg.phone_number}',
+    #                           parse_mode=None)
     return SendResponse(data=new_msg.session_id)
 
 
@@ -36,11 +36,11 @@ class PageResponse(BaseResponseModel):
 
 
 @router.get('/get_msg_page', response_model=PageResponse)
-async def get_msg_page(page: int = 0, size: int = 10, status: int = 0):
+async def get_msg_page(chat_id:str,page: int = 0, size: int = 10, status: int = 0):
     if size > 100:
         raise ValueError('MaxSize:100')
     db = DbService()
-    data = db.get_message_page(page, size, status)
+    data = db.get_message_page(chat_id,page, size, status)
     return PageResponse(data=data)
 
 
@@ -60,7 +60,7 @@ class PendingMessageResponse(BaseResponseModel):
 
 
 @router.get('/get_pending_message', response_model=PendingMessageResponse)
-async def get_pending_message():
+async def get_pending_message(chat_id:str):
     db = DbService()
-    one = db.get_one_pending_message()
+    one = db.get_one_pending_message(chat_id)
     return PendingMessageResponse(data=one)

@@ -28,10 +28,10 @@ class BrowserManager:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def __init__(self, api_pre, max_browser_num: int = 1):
+    def __init__(self, chat_id, api_pre, max_browser_num: int = 1):
+        self.chat_id = chat_id
         self.api_pre = api_pre
         self.ads_api = AdsApi()
-
         self.max_browser_num = max_browser_num
         self.one_browser_max_task = 4
         self.browser_gen = self.gen_new_browser()
@@ -55,7 +55,7 @@ class BrowserManager:
         logger.info(resp)
 
     def get_pending_message(self):
-        api = f'{self.api_pre}/get_pending_message'
+        api = f'{self.api_pre}/get_pending_message?chat_id={self.chat_id}'
         resp = requests.get(api)
         data = resp.json()
         message_info = data.get('data', None)
@@ -65,13 +65,14 @@ class BrowserManager:
         api = f'{self.api_pre}/update_browser_status'
         body = {
             'browser_id': browser_id,
+            'chat_id': self.chat_id,
             'status': status
         }
         resp = requests.post(api, json=body)
         logger.info(resp)
 
     def get_pending_browser(self):
-        api = f'{self.api_pre}/get_pending_browser'
+        api = f'{self.api_pre}/get_pending_browser?chat_id={self.chat_id}'
         resp = requests.get(api)
         data = resp.json()
         browser_info = data.get('data', None)
@@ -170,10 +171,10 @@ class BrowserManager:
                 msg = message_info.get('msg')
                 phone_number = message_info.get('phone_number')
                 try:
-                    self.update_message_status(session_id,2)
-                    do_status =self.detail_msg(phone_number, msg)
+                    self.update_message_status(session_id, 2)
+                    do_status = self.detail_msg(phone_number, msg)
                     if do_status:
-                        self.update_message_status(session_id,4)
+                        self.update_message_status(session_id, 4)
                     else:
                         self.update_message_status(session_id, 3)
                 except Exception as e:
@@ -182,5 +183,3 @@ class BrowserManager:
             else:
                 logger.info(f'暂无消息，睡眠10s')
                 time.sleep(10)
-
-

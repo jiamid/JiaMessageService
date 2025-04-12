@@ -9,8 +9,8 @@
 <div class="container">
     <div class="sidebar">
         <ul>
-            <li><a href="/browser">Browser</a></li>
-            <li><a href="/message">Message</a></li>
+            <li><a href="/browser/{{ chat_id }}">Browser</a></li>
+            <li><a href="/message/{{ chat_id }}">Message</a></li>
         </ul>
     </div>
     <div class="main">
@@ -28,16 +28,18 @@
         <div id="message-list" class="table-list">
             <table id="message-table">
                 <colgroup>
-                    <col style="width: 10%;">
-                    <col style="width: 10%;">
-                    <col style="width: 10%;">
-                    <col style="width: 30%;">
                     <col style="width: 20%;">
+                    <col style="width: 10%;">
+                    <col style="width: 10%;">
+                    <col style="width: 10%;">
+                    <col style="width: 20%;">
+                    <col style="width: 15%;">
                 </colgroup>
                 <thead>
                 <tr>
                     <th>Session</th>
                     <th>Phone</th>
+                    <th>ChatId</th>
                     <th>Status</th>
                     <th>Msg</th>
                     <th>CreatedAt</th>
@@ -65,7 +67,7 @@
     async function fetchMessages(page) {
         currentPage = page;
         const status = document.getElementById("status").value;
-        const res = await fetch(`/get_msg_page?page=${page}&size=${pageSize}&status=${status}`);
+        const res = await fetch(`/get_msg_page?page=${page}&size=${pageSize}&status=${status}&chat_id={{ chat_id }}`);
         const json = await res.json();
 
         const list = document.getElementById("message-list").querySelector("tbody");
@@ -76,6 +78,7 @@
             tr.innerHTML = `
                 <td>${msg.session_id}</td>
                 <td>${msg.phone_number}</td>
+                <td>${msg.chat_id}</td>
                 <td>${statusStr}</td>
                 <td>${msg.msg}</td>
                 <td>${msg.created_at}</td>

@@ -13,14 +13,28 @@ from fastapi.templating import Jinja2Templates
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
+
 @router.get("/", response_class=RedirectResponse)
 async def index(request: Request):
-    return RedirectResponse(url='/message',status_code=302)
+    context = {
+        "request": request,  # 必须包含request
+    }
+    return templates.TemplateResponse("index.html", context)
 
-@router.get("/message", response_class=HTMLResponse)
-async def go_message(request: Request):
-    return templates.TemplateResponse("message.html", {"request": request})
 
-@router.get("/browser", response_class=HTMLResponse)
-async def go_browser(request: Request):
-    return templates.TemplateResponse("browser.html", {"request": request})
+@router.get("/message/{chat_id}", response_class=HTMLResponse)
+async def go_message(chat_id: str, request: Request):
+    context = {
+        "request": request,  # 必须包含request
+        "chat_id": chat_id,  # 路径参数
+    }
+    return templates.TemplateResponse("message.html", context)
+
+
+@router.get("/browser/{chat_id}", response_class=HTMLResponse)
+async def go_browser(chat_id: str, request: Request):
+    context = {
+        "request": request,  # 必须包含request
+        "chat_id": chat_id,  # 路径参数
+    }
+    return templates.TemplateResponse("browser.html", context)

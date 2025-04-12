@@ -32,14 +32,15 @@ class PageResponse(BaseResponseModel):
 
 
 @router.get('/get_browser_page', response_model=PageResponse)
-async def get_browser_page(page: int = 0, size: int = 10, status: int = 0):
+async def get_browser_page(chat_id: str, page: int = 0, size: int = 10, status: int = 0):
     db = DbService()
-    data = db.get_browser_page(page, size, status)
+    data = db.get_browser_page(chat_id, page, size, status)
     return PageResponse(data=data)
 
 
 class UpdateBrowser(BaseModel):
     browser_id: str
+    chat_id: str
     status: int
     detail: str = ''
 
@@ -47,7 +48,7 @@ class UpdateBrowser(BaseModel):
 @router.post('/update_browser_status', response_model=BaseResponseModel)
 async def update_browser_status(update_data: UpdateBrowser):
     db = DbService()
-    db.update_browser_status(update_data.browser_id, update_data.status, update_data.detail)
+    db.update_browser_status(update_data.chat_id, update_data.browser_id, update_data.status, update_data.detail)
     return BaseResponseModel()
 
 
@@ -56,7 +57,7 @@ class PendingBrowserResponse(BaseResponseModel):
 
 
 @router.get('/get_pending_browser', response_model=PendingBrowserResponse)
-async def get_pending_browser():
+async def get_pending_browser(chat_id: str):
     db = DbService()
-    one = db.get_one_pending_browser()
+    one = db.get_one_pending_browser(chat_id)
     return PendingBrowserResponse(data=one)

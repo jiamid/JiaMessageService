@@ -19,6 +19,7 @@ class BrowserStatusType(IntEnum):
 
 class BrowserModel(BaseModel):
     browser_id: str = Field()
+    chat_id:str = Field()
 
 
 class FullBrowserModel(BrowserModel):

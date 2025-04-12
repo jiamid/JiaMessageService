@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+        }
+        .container {
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            display: flex;
+            justify-content: center;
+        }
+        .input-box {
+            width: 300px;
+            padding: 12px 16px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 24px 0 0 24px; /* 左侧圆角 */
+            outline: none;
+        }
+        .submit-btn {
+            padding: 12px 20px;
+            font-size: 16px;
+            background-color: #ccc;
+            color: white;
+            border: none;
+            border-radius: 0 24px 24px 0; /* 右侧圆角 */
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .submit-btn:hover {
+            background-color: #333;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+            display: none;
+        }
+        .none_a {
+            color: inherit;
+            text-decoration: none;
+        }
+    </style>
+  <!-- 使用 Font Awesome 的 Telegram 图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+
+        <h1><a href="https://t.me/TcccMsgBot" class="none_a" target="_blank">TcccMsgBot <i class="fab fa-telegram-plane telegram-icon"></i>
+        </a>
+        </h1>
+        <div class="input-group">
+            <input
+                type="text"
+                id="chatIdInput"
+                class="input-box"
+                placeholder="Tg ChatId"
+                pattern="[a-zA-Z0-9\-]+"
+                title="Only letters, numbers, and hyphens are allowed"
+                required
+            />
+            <button id="submitBtn" class="submit-btn">GO</button>
+
+        </div>
+        <p id="errorMsg" class="error">Invalid characters! Use only a-z, 0-9, or -</p>
+    </div>
+
+    <script>
+        const input = document.getElementById("chatIdInput");
+        const button = document.getElementById("submitBtn");
+        const errorMsg = document.getElementById("errorMsg");
+
+        // 检查输入是否合法
+        function validateInput() {
+            const regex = /^[a-zA-Z0-9\-]+$/;
+            if (!regex.test(input.value)) {
+                errorMsg.style.display = "block";
+                return false;
+            }
+            errorMsg.style.display = "none";
+            return true;
+        }
+
+        // 跳转到 /message/{chat_id}
+        function navigateToChat() {
+            if (validateInput()) {
+                window.location.href = `/message/${input.value}`;
+            }
+        }
+
+        // 点击按钮跳转
+        button.addEventListener("click", navigateToChat);
+
+        // 按 Enter 跳转
+        input.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+                navigateToChat();
+            }
+        });
+    </script>
+</body>
+</html>

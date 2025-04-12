@@ -9,8 +9,8 @@
 <div class="container">
     <div class="sidebar">
         <ul>
-            <li><a href="/browser">Browser</a></li>
-            <li><a href="/message">Message</a></li>
+            <li><a href="/browser/{{ chat_id }}">Browser</a></li>
+            <li><a href="/message/{{ chat_id }}">Message</a></li>
         </ul>
     </div>
     <div class="main">
@@ -31,7 +31,8 @@
                     <col style="width: 10%;">
                     <col style="width: 10%;">
                     <col style="width: 15%;">
-                    <col style="width: 30%;">
+                    <col style="width: 25%;">
+                    <col style="width: 10%;">
                     <col style="width: 10%;">
 
                 </colgroup>
@@ -41,6 +42,7 @@
                     <th>Status</th>
                     <th>LastUsedAt</th>
                     <th>Detail</th>
+                    <th>ChatId</th>
                     <th>Reset</th>
                 </tr>
                 </thead>
@@ -80,7 +82,7 @@
     async function fetchBrowser(page) {
         currentPage = page;
         const status = document.getElementById("status").value;
-        const res = await fetch(`/get_browser_page?page=${page}&size=${pageSize}&status=${status}`);
+        const res = await fetch(`/get_browser_page?page=${page}&size=${pageSize}&status=${status}&chat_id={{ chat_id }}`);
         const json = await res.json();
 
         const list = document.getElementById("browser-list").querySelector("tbody");
@@ -94,6 +96,7 @@
                 <td>${statusStr}</td>
                 <td>${lastUsedTime}</td>
                 <td>${browser.detail}</td>
+                <td>${browser.chat_id}</td>
                 <td><button onclick="confirmReset('${browser.browser_id}')">重置</button></td>
             `;
             list.appendChild(tr);
@@ -128,6 +131,7 @@
             },
             body: JSON.stringify({
                 browser_id: browserId,
+                chat_id: '{{ chat_id }}',
                 status: 5
             })
         });
@@ -162,7 +166,8 @@
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                browser_id: browserId
+                browser_id: browserId,
+                chat_id: '{{ chat_id }}'
             })
         });
 
